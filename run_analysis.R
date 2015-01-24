@@ -24,12 +24,12 @@ dataSet = rbind(training, testing)
 
 # Create a vector of the column header names
 features = scan(fileLocationFeatureNames, sep=" ", what = "character")[c(FALSE, TRUE)]
-features = c(features, c("activity"))
-features
+features = c("Subject", features, "Activity")
+
 names(dataSet) = features
 
 # Filter the column headers to only have std and mean
-cols = grep("[Mm]ean|std|activity",colnames(dataSet))
+cols = grep("[Mm]ean|std|Activity|Subject",colnames(dataSet))
 dataSet = dataSet[cols]
 
 # Clean up column names
@@ -41,10 +41,13 @@ cleanNames = gsub("\\)", "", cleanNames)
 # Replace number labels with factors
 names(dataSet) = cleanNames
 activities = c("Walking", "Walking.Upstairs", "Walking.Downstairs", "Sitting", "Standing", "Laying")
-dataSet$activity = activities[dataSet$activity]
+dataSet$Activity = activities[dataSet$Activity]
 
+# Aggregate by Subject and Activity
+aggDataSet = aggregate(. ~ Subject+Activity, data=dataSet, FUN=mean)
 
-
+# Create text file of tidy set
+write.table(aggDataSet, file = "tidySet.txt", row.name = FALSE)
 
 
 
